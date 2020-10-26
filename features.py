@@ -1,5 +1,6 @@
 import regex
 from tldextract import extract
+import ipaddress
 
 # -1 legitimate
 # 1 phishing
@@ -8,9 +9,20 @@ from tldextract import extract
 
 def main(url):
     print("url : " + url)
-    check = [[url_length(url), having_at_symbol(
+
+    check = [[having_IP_Address(url), url_length(url), having_at_symbol(
         url), prefix_suffix(url), sub_domain(url)]]
+
     return check
+
+
+# feature 1 -- Using the IP Address
+def having_IP_Address(url):
+    try:
+        ipaddress.ip_address(url)
+        return 1
+    except:
+        return -1
 
 
 # feature 2 -- Long URL to Hide the Suspicious Part
@@ -33,16 +45,17 @@ def having_at_symbol(url):
         return 1
 
 
-# feature 6 --Adding Prefix or Suffix Separated by (-) to the Domain
+# feature 6 -- Adding Prefix or Suffix Separated by (-) to the Domain
 def prefix_suffix(url):
-    try:
-        prefix_suffix = extract(url)
-        if(prefix_suffix.count('-')):
-            return 1
-        else:
-            return -1
-    except:
-        return 'Error'
+    subDomain, domain, suffix = extract(url)
+    # print("subDomain : "+subDomain)
+    # print("Domain : "+domain)
+    # print("Suffix : "+suffix)
+
+    if(domain.count('-')):
+        return 1
+    else:
+        return -1
 
 
 # feature 7 -- Sub Domain and Multi Sub Domains
@@ -57,6 +70,3 @@ def sub_domain(url):
             return 1
     except:
         return 'error'
-
-
-
